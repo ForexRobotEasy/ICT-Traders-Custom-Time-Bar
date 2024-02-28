@@ -1,0 +1,100 @@
+
+//+------------------------------------------------------------------+
+//|                                               ICT Traders Custom Time Bar.mq5 |
+//|                                           Copyright 2022, Forex Robot Easy Team |
+//|                                             https://www.forexroboteasy.com |
+//+------------------------------------------------------------------+
+#property copyright 'Copyright 2022, Forex Robot Easy Team'
+#property link      'https://www.forexroboteasy.com'
+#property version   '1.00'
+
+//+------------------------------------------------------------------+
+//| Include files                                                      |
+//+------------------------------------------------------------------+
+#include <Controls\ControlDropdown.mqh>
+
+//+------------------------------------------------------------------+
+//| Global variables                                                   |
+//+------------------------------------------------------------------+
+string g_timezone; // Selected time zone from the dropdown menu
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                     |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Create the dropdown menu for time zone selection
+    CControlDropdown timezoneDropdown;
+    timezoneDropdown.Create(0, 'Timezone', 0, 0, 0, 0, 0, 0);
+    timezoneDropdown.AddItem('Eastern Standard Time (New York Local Time)');
+    timezoneDropdown.AddItem('Central Standard Time');
+    timezoneDropdown.AddItem('Pacific Standard Time');
+    
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                               |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Get the selected time zone from the dropdown menu
+    g_timezone = CControlDropdown::GetValue(0);
+    
+    // Convert server time to local time based on the selected time zone
+    datetime localTime = ConvertToTimeZone(TimeCurrent(), g_timezone);
+    
+    // Add a vertical line at a specific time in the selected time zone
+    if (localTime == ConvertToTimeZone(D'2022.01.01 10:00:00', g_timezone))
+        AddVerticalLine(localTime, clrRed);
+    
+    // Calculate and draw OHLC lines based on the selected time zone or actual server time
+    double open = iOpen(Symbol(), PERIOD_D1, 0);
+    double high = iHigh(Symbol(), PERIOD_D1, 0);
+    double low = iLow(Symbol(), PERIOD_D1, 0);
+    double close = iClose(Symbol(), PERIOD_D1, 0);
+    
+    if (g_timezone == 'Eastern Standard Time (New York Local Time)')
+    {
+        open = iOpen(Symbol(), PERIOD_D1, 1); // Previous day's open
+        high = iHigh(Symbol(), PERIOD_D1, 1); // Previous day's high
+        low = iLow(Symbol(), PERIOD_D1, 1); // Previous day's low
+        close = iClose(Symbol(), PERIOD_D1, 1); // Previous day's close
+    }
+    
+    AddHorizontalLine(open, 'Open', clrGreen);
+    AddHorizontalLine(high, 'High', clrBlue);
+    AddHorizontalLine(low, 'Low', clrRed);
+    AddHorizontalLine(close, 'Close', clrYellow);
+}
+
+//+------------------------------------------------------------------+
+//| Convert server time to local time based on the selected time zone |
+//+------------------------------------------------------------------+
+datetime ConvertToTimeZone(datetime serverTime, string timezone)
+{
+    // Implementation logic for converting server time to local time
+    // ...
+    
+    datetime localTime = serverTime; // Placeholder implementation
+    
+    return localTime;
+}
+
+//+------------------------------------------------------------------+
+//| Add a vertical line at a specific time with the given color        |
+//+------------------------------------------------------------------+
+void AddVerticalLine(datetime time, color lineColor)
+{
+    // Implementation logic for adding a vertical line
+    // ...
+}
+
+//+------------------------------------------------------------------+
+//| Add a horizontal line at the given price with the given label      |
+//+------------------------------------------------------------------+
+void AddHorizontalLine(double price, string label, color lineColor)
+{
+    // Implementation logic for adding a horizontal line
+    // ...
+}
